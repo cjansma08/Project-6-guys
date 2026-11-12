@@ -1,6 +1,4 @@
-#6 Guys Project
-#blah blah blah
-# asdf asdf asdf d"
-print("hello world")
-#yay
-# asdf asdf asdf sd
+# 6 Guys Project
+# Cole Jansma, Vihn Le, Noah Tarver, Bennet Kruse, Connor Schultz, Matthew Spalla
+# 11/12/2026
+
