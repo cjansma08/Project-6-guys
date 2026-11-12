@@ -23,5 +23,3 @@ while car_selection!=1 and car_selection!=2 and car_selection!=3 and car_selecti
     car_selection=int(car_selection)
 
 gear_ratios_labels, gear_ratios, parameters_symbols, parameters, exp_omega_es, exp_torque_es, max_omega_e, max_omega_e_label=mf.data_function(car_selection)
-
-#ahh
