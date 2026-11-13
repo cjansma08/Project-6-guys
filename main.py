@@ -31,3 +31,5 @@ while car_selection!=5: # loops until car_selection=5
         gear_ratios_labels, gear_ratios, parameters_symbols, parameters, exp_omega_es, exp_torque_es, max_omega_e, max_omega_e_label=mf.data_function(car_selection)
 
 print("\nThank you!\n\n")
+
+
