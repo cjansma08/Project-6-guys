@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 def data_function(car_selection):
 
-    workbook = xl.load_workbook("project_data.xlsx")
+    workbook = xl.load_workbook("test_data.xlsx")
     sheet = workbook["Car{}".format(car_selection)]
 
     gear_ratios_labels = []
@@ -64,7 +64,7 @@ def data_function(car_selection):
 def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max_omega_e):
 
     # Assigns names to parameters to aid in calculation
-    car_velocity = parameters[0]
+    car_velocity_kmh = parameters[0]
     terrain_slope = parameters[1]
     wheelbase = parameters[2]
     wheel_radius = parameters[3]
@@ -79,15 +79,17 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
     drag_coeff = parameters[12]
     frontal_area = parameters[13]
 
+    car_velocity_ms = car_velocity_kmh * 1000 / 3600 # converts km/hr to m/s for calculations
+
     torque_rpm_curve_fit = poly.fit(exp_omega_es,exp_torque_es,4) # fits a quartic curve to the rpm-torque data
 
     r_rolling = roll_resistance_coeff * car_weight * np.cos(terrain_slope) # rolling resistance
     grade_load = car_weight * np.sin(terrain_slope) # grade load
-    r_air = 0.5 * air_density * drag_coeff * frontal_area * car_velocity**2 # air drag
+    r_air = 0.5 * air_density * drag_coeff * frontal_area * car_velocity_ms**2 # air drag
 
     r = r_rolling + grade_load + r_air # R
 
-    omega_w = car_velocity / wheel_radius # rpm at wheels
+    omega_w = (car_velocity_ms / wheel_radius) * (60/(2*np.pi)) # rpm at wheels
     omega_t = final_drive_ratio * omega_w # rpm at transmission
 
     omega_es = [] # rpm at engine for each gear
@@ -122,9 +124,9 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
             torque_e_Nm = torque_rpm_curve_fit(omega_e)
             torque_e_Nms.append(torque_e_Nm)
             
-            torque_e_lbf = torque_e_Nm * 0.737562149
+            torque_e_ftlb = torque_e_Nm * 0.737562149
 
-            power = (omega_e * torque_e_lbf) / 5252
+            power = (omega_e * torque_e_ftlb) / 5252
             powers.append(power)
 
             torque_t = transmission_eff * gear_ratios[i] * torque_e_Nm
