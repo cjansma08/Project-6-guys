@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 def data_function(car_selection):
 
-    workbook = xl.load_workbook("test_data.xlsx")
+    workbook = xl.load_workbook("project_data.xlsx")
     sheet = workbook["Car{}".format(car_selection)]
 
     gear_ratios_labels = []
