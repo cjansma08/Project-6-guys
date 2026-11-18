@@ -190,9 +190,9 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
             wr_stat = car_weight * (front_wheel_CoG_distance / wheelbase)
             wr_stats.append(wr_stat)
 
-    return rs, omega_es, torque_e_Nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats
+    return rs, omega_es, torque_e_Nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats, g, p, r, car_weight, acceleration
 
-def output_functions(workbook_results, counter, car, gear_ratios_labels, gear_ratios, rs, omega_es, torque_e_Nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats, parameters_symbols, parameters, max_omega_e):
+def output_function(workbook_results, counter, car, gear_ratios_labels, gear_ratios, rs, omega_es, torque_e_Nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats, parameters_symbols, parameters, max_omega_e):
 
     results_sheet = workbook_results.create_sheet("Results{}".format(counter))
 
@@ -219,3 +219,20 @@ def output_functions(workbook_results, counter, car, gear_ratios_labels, gear_ra
     results_sheet["C25"] = max_omega_e[0]
     
     workbook_results.save("project_results.xlsx")
+
+def plotting_function(g, p, r, car_weight):
+
+    # weight vs acceleration plot
+
+    p_car_weight = [car_weight, car_weight+700, car_weight+1400, car_weight+2100, car_weight+2800]
+    acceleration = (g / p_car_weight) * (p - r)
+    for i in range(0,5):
+        acceleration = (g / p_car_weight[i]) * (p - r)
+        plt.plot(p_car_weight[i], acceleration)
+        plt.show()
+
+    # air resistance vs speed 
+
+    # acceleration vs speed
+
+    # rpm vs power 
