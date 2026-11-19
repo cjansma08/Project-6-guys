@@ -1,4 +1,8 @@
-# 6 Guys Project
+# User selects a car from the 4 options, the program retrieves data from a spreadsheet, calculates a acceleration, traction, rpm, hp, torque, and axle loads for each gear,
+# inputs those results and data used into another spreadsheet, and plots traction vs speed, weight vs acceleration, speed vs acceleration, and rpm vs torque and hp,
+# then allows the user to select another vehicle until they exit the program
+
+# 6 Guys
 # Cole Jansma, Vinh Le, Noah Tarver, Bennet Kruse, Connor Schultz, Matthew Spalla
 # 11/12/2026
 
@@ -16,10 +20,10 @@ print(spacer)
 
 print("\nCar Options:\n1, 2015 Honda Odyssey (3.5L)\n2, 2019 Mazda MX-5 Miata (Manual)\n3, 2026 Toyota GR Corolla (Manual)\n4, 2017 Chevrolet Equinox LT (2.4L)\n5, Exit")
 
-car_selection = 1 # intializes while loops
-counter = 0 # counts how many times the loop runs 
+car_selection = 1 # intializes while loop
+counter = 0 # counts how many times the loop runs
 
-workbook_data = xl.load_workbook("project_data.xlsx")
+workbook_data = xl.load_workbook("project_data.xlsx") 
 workbook_results = xl.load_workbook("project_results.xlsx")
 
 # Remove all worksheets for workbook_results
@@ -37,7 +41,7 @@ while car_selection!=5: # loops until car_selection=5
 
     car_selection=int(car_selection) # transforms car_selection into an integer for use in data_function
 
-    if car_selection!=5: # ends program if car_selection=5
+    if car_selection!=5: # ends program if car_selection=5, and doesn't run this section to prevent errors
         car, gear_ratios_labels, gear_ratios, parameters_symbols, parameters, exp_omega_es, exp_torque_es, max_omega_e, max_omega_e_label = mf.data_function(workbook_data, car_selection, spacer)
         rs, omega_es, torque_e_nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats, torque_rpm_curve_fit, g = mf.calculation_function(gear_ratios, parameters, exp_omega_es, exp_torque_es, max_omega_e)
         mf.output_function(workbook_results, counter, car, gear_ratios_labels, gear_ratios, rs, omega_es, torque_e_nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats, parameters_symbols, parameters, max_omega_e)

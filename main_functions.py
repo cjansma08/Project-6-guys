@@ -1,13 +1,16 @@
 # Defines functions for project
+
+# 6 Guys
 # Cole Jansma, Vinh Le, Noah Tarver, Bennet Kruse, Connor Schultz, Matthew Spalla
 # 11/12/2026
 
 import numpy as np
-import openpyxl as xl
 from numpy.polynomial import Polynomial as poly
 from matplotlib import pyplot as plt
 
 def data_function(workbook_data, car_selection, spacer):
+
+    # Extracts selected car's data from the data spreadsheet and appends them into arrays for later use
 
     data_sheet = workbook_data["Car{}".format(car_selection)]
 
@@ -17,6 +20,7 @@ def data_function(workbook_data, car_selection, spacer):
 
     car = data_sheet["A1"].value
 
+    # Arrays data is appended into
     gear_ratios_labels = []
     gear_ratios = []
     parameters_symbols = []
@@ -26,7 +30,7 @@ def data_function(workbook_data, car_selection, spacer):
     max_omega_e = []
     max_omega_e_label = []
 
-    for i in range(4,10): # pulls gear ratios and labels from sheet
+    for i in range(4,10): # extracts gear ratios and labels from sheet
         gear_ratio_label = data_sheet["A{}".format(i)].value
         gear_ratio = data_sheet["B{}".format(i)].value
 
@@ -39,7 +43,7 @@ def data_function(workbook_data, car_selection, spacer):
         gear_ratios.append(gear_ratio)
 
 
-    for i in range(12,26): # pulls parameters from sheet
+    for i in range(12,26): # extracts parameters and symbols from sheet
         parameter_symbol = data_sheet["B{}".format(i)].value
         parameter = data_sheet["C{}".format(i)].value
 
@@ -51,14 +55,14 @@ def data_function(workbook_data, car_selection, spacer):
         parameters_symbols.append(parameter_symbol)
         parameters.append(parameter)
 
-    for i in range(4,19): # pulls dyno data from sheet
+    for i in range(4,19): # extracts dyno data from sheet
         exp_omega_e = data_sheet["F{}".format(i)].value
         exp_torque_e = data_sheet["G{}".format(i)].value
 
         exp_omega_es.append(exp_omega_e)
         exp_torque_es.append(exp_torque_e)
 
-    # pulls max rpm and label from sheet
+    # extracts max rpm and label from sheet
     max_omega_e_label.append(data_sheet["F21"].value)
     max_omega_e.append(data_sheet["G21"].value)
 
@@ -67,6 +71,7 @@ def data_function(workbook_data, car_selection, spacer):
     print("All data is positive.")
 
     return  car, gear_ratios_labels, gear_ratios, parameters_symbols, parameters, exp_omega_es, exp_torque_es, max_omega_e, max_omega_e_label
+
 
 def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max_omega_e):
 
@@ -94,12 +99,12 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
     omega_t = final_drive_ratio * omega_w # rpm at transmission
 
     omega_es = [] # rpm at engine for each gear
-    rs = [] # R
+    rs = [] # resistance force for each gear
     torque_e_nms = [] # torque at engine for each gear
     powers = [] # power at engine for each gear
     torque_ts = [] # torque at transmission for each gear
     torque_ds = [] # torque at differential for each gear
-    ps = [] # P for each gear
+    ps = [] # traction for each gear
     accelerations = [] # a for each gear
     wfs = [] # dynamic front axle load for each gear
     wrs = [] # dynamic rear axle load for each gear
@@ -108,11 +113,12 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
 
     g = 9.8
 
-    for i in range(0,6):
+    for i in range(0,6): # calculates results for each gear
         
         omega_e = gear_ratios[i] * omega_t
 
-        if omega_e > max_omega_e[0]:
+        # Verifies rpm is less than max rpm,
+        if omega_e > max_omega_e[0]: # if rpm is greater than max rpm, "OOR" is used
             omega_e = "OOR"
             omega_es.append(omega_e)
 
@@ -148,7 +154,7 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
 
             wr = "OOR"
             wrs.append(wr)
-        else:
+        else: # results if rpm is less than max rpm
             r_rolling = roll_resistance_coeff * car_weight * np.cos(terrain_angle_rad) # rolling resistance
             grade_load = car_weight * np.sin(terrain_angle_rad) # grade load
             r_air = 0.5 * air_density * drag_coeff * frontal_area * car_velocity_ms**2 # air drag
@@ -192,10 +198,12 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
 
     return rs, omega_es, torque_e_nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats, torque_rpm_curve_fit, g
 
+
 def output_function(workbook_results, counter, car, gear_ratios_labels, gear_ratios, rs, omega_es, torque_e_Nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats, parameters_symbols, parameters, max_omega_e):
 
-    results_sheet = workbook_results.create_sheet("Results{}".format(counter))
+    results_sheet = workbook_results.create_sheet("Results{}".format(counter)) # new sheet is made for each car selected
 
+    # arrays used for inputting results and data into results spreadsheet
     columns = ["B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"]
     results_labels = ["Gear", "Ratio", "WR(N)", "WF(N)", "WRstat(N)", "WFstat(N)", "a(m/s2)", "P(N)", "R(N)", "HP(hp)", "Te(Nm)", "omega_e(RPM)"]
     results = [gear_ratios_labels, gear_ratios, wrs, wfs, wr_stats, wf_stats, accelerations, ps, rs, powers, torque_e_Nms, omega_es]
@@ -212,13 +220,14 @@ def output_function(workbook_results, counter, car, gear_ratios_labels, gear_rat
     results_sheet["B11"] = "Data:"
 
     for i in range(0,14):
-        results_sheet["C{}".format(12+i)] = parameters_symbols[i]
-        results_sheet["B{}".format(12+i)] = parameters[i]
+        results_sheet["B{}".format(12+i)] = parameters_symbols[i]
+        results_sheet["C{}".format(12+i)] = parameters[i]
 
     results_sheet["B25"] = "Max Omega"
     results_sheet["C25"] = max_omega_e[0]
     
     workbook_results.save("project_results.xlsx")
+
 
 def plotting_function(car, counter, parameters, gear_ratios_labels, gear_ratios, torque_rpm_curve_fit, max_omega_e, g):
 
@@ -235,30 +244,29 @@ def plotting_function(car, counter, parameters, gear_ratios_labels, gear_ratios,
     drag_coeff = parameters[12]
     frontal_area = parameters[13]
 
-    car_figure= plt.figure(counter)
+    car_figure = plt.figure(counter)
 
     # traction vs speed  
 
-    valid_ps = [] # only ps that come from rpms less than max
-    valid_speeds_1 = [] # 1 is used to distinguish from 1st subplot
-
-    car_velocity_kmh_array = np.linspace(0,200,500) # used for x axis 
+    car_velocity_kmh_array = np.linspace(5,200,500) # used for x axis 
     car_velocity_ms_array = car_velocity_kmh_array * 1000 / 3600 # used for calculation
 
     for i in range(0,6): # loops through each gear
 
-        valid_ps = []
-        valid_speeds_1 = [] # 1 is used to distinguish from 1st subplot
+        valid_ps = [] # only ps that come from rpms less than max
+        valid_speeds_1 = [] # 1 is used to distinguish from 3rd subplot, only speeds that with rpms less than max rpm
 
         car_velocity_kmh_array = np.linspace(5,200,500)
-        car_velocity_ms_array = car_velocity_kmh_array * (1000/3600)
+        car_velocity_ms_array = car_velocity_kmh_array * (10/36)
         
         for velocity in car_velocity_ms_array: 
+           
             omega_w = (velocity / wheel_radius) * (60/(2*np.pi)) # rpm at wheels
             omega_t = final_drive_ratio * omega_w # rpm at transmission
             omega_e = gear_ratios[i] * omega_t # rpm at engine
 
-            if omega_e <= max_omega_e[0]:
+            if omega_e <= max_omega_e[0]: # checks rpm is less than max rpm
+               
                 torque_e_nm = torque_rpm_curve_fit(omega_e)
                 torque_t = transmission_eff * gear_ratios[i] * torque_e_nm
                 torque_d = final_drive_eff * final_drive_ratio * torque_t
@@ -269,7 +277,7 @@ def plotting_function(car, counter, parameters, gear_ratios_labels, gear_ratios,
                 valid_speeds_1.append(velocity * 3.6) # converts to km/h
 
         plt.subplot(2,2,1)
-        plt.plot(valid_speeds_1, valid_ps, label = gear_ratios_labels[i])
+        plt.plot(valid_speeds_1, valid_ps, label = gear_ratios_labels[i]) # found how to do labels in documentation
 
     plt.title("Traction vs Speed")
     plt.xlabel("Car Velocity (km/h)")
@@ -282,12 +290,14 @@ def plotting_function(car, counter, parameters, gear_ratios_labels, gear_ratios,
 
     car_weight_array = np.linspace(car_weight-2000,car_weight+4500)
    
-    for i in range(0,6):
+    for i in range(0,6): # loops through each gear
+       
         omega_w = (car_velocity_ms / wheel_radius) * (60/(2*np.pi)) # rpm at wheels
         omega_t = final_drive_ratio * omega_w # rpm at transmission
         omega_e = gear_ratios[i] * omega_t # rpm at engine
         
         if omega_e <= max_omega_e[0]: # only plots if rpms less than max rpm
+            
             torque_e_nm = torque_rpm_curve_fit(omega_e)
             torque_t = transmission_eff * gear_ratios[i] * torque_e_nm
             torque_d = final_drive_eff * final_drive_ratio * torque_t
@@ -313,11 +323,8 @@ def plotting_function(car, counter, parameters, gear_ratios_labels, gear_ratios,
 
     for i in range(0,6): # loops through each gear
 
-        valid_accelerations = []
-        valid_speeds_2 = [] # 2 is used to distinguish from 1st subplot
-
-        car_velocity_kmh_array = np.linspace(50,200,500) # Reassigns car velocity array to a more reasonable range for this plot
-        car_velocity_ms_array = car_velocity_kmh_array * (1000/3600)
+        valid_accelerations = [] # only accelerations that come from rpms less than max
+        valid_speeds_2 = [] # 2 is used to distinguish from 1st subplot, only speeds with rpms less than max
         
         for velocity in car_velocity_ms_array: 
             omega_w = (velocity / wheel_radius) * (60/(2*np.pi)) # rpm at wheels
@@ -366,7 +373,7 @@ def plotting_function(car, counter, parameters, gear_ratios_labels, gear_ratios,
     plt.ylabel("Torque (Nm) and Power (hp)")
     plt.legend(["Torque", "Power"])
 
-    plt.suptitle(car)
+    plt.suptitle(car) # found how to do title of subplots on documentation
     plt.tight_layout()
     plt.show()
     car_figure.savefig("{} figure.png".format(car), dpi = 600)
