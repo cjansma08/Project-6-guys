@@ -39,8 +39,8 @@ while car_selection!=5: # loops until car_selection=5
 
     if car_selection!=5: # ends program if car_selection=5
         car, gear_ratios_labels, gear_ratios, parameters_symbols, parameters, exp_omega_es, exp_torque_es, max_omega_e, max_omega_e_label = mf.data_function(workbook_data, car_selection, spacer)
-        rs, omega_es, torque_e_Nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats, g, p, r, car_weight, acceleration = mf.calculation_function(gear_ratios, parameters, exp_omega_es, exp_torque_es, max_omega_e)
-        mf.output_function(workbook_results, counter, car, gear_ratios_labels, gear_ratios, rs, omega_es, torque_e_Nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats, parameters_symbols, parameters, max_omega_e)
-        mf.plotting_function(g, p, r, car_weight)
+        rs, omega_es, torque_e_nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats, torque_rpm_curve_fit, g = mf.calculation_function(gear_ratios, parameters, exp_omega_es, exp_torque_es, max_omega_e)
+        mf.output_function(workbook_results, counter, car, gear_ratios_labels, gear_ratios, rs, omega_es, torque_e_nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats, parameters_symbols, parameters, max_omega_e)
+        mf.plotting_function(car, counter, parameters, gear_ratios_labels, gear_ratios, torque_rpm_curve_fit, max_omega_e, g)
 
 print("\nThank you!\n\n")
